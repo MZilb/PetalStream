@@ -17,27 +17,7 @@ import math
 import pythonosc.dispatcher
 import pythonosc.osc_server
 
-from djitellopy import tello
-from time import sleep
 
-# Set threshold
-channel1_threshold = 0.4
-
-# Connect Drone and get battery
-me = tello.Tello()
-me.connect()
-print(me.get_battery())
-
-#Takeoff and start spinning
-me.takeoff()
-me.send_rc_control(0,50,0,0)
-sleep(2)
-me.send_rc_control(0,0,0,50)
-sleep(5)
-me.send_rc_control(0,50,0,0)
-sleep(2)
-me.send_rc_control(0,0,0,0)
-me.land()
 
 def print_petal_stream_handler(unused_addr, *args):
     '''
@@ -72,28 +52,29 @@ def print_petal_stream_handler(unused_addr, *args):
     sample_id = args[0]
     unix_ts = args[1] + args[2]
     lsl_ts = args[3] + args[4]
-    channel1 = args[8:]
+    channel1 = args[5]
+    channel2 = args[6]
+    channel3 = args[7]
+    channel4 = args[8]
+
     # data2 = args[9]
     # data3 = args[10]
     # data4 = args[11]
 
     print(
         f'sample_id: {sample_id}, unix_ts: {unix_ts}, '
-        f'lsl_ts: {lsl_ts}, data: {data1}'
+        f'lsl_ts: {lsl_ts}, data: {channel1,channel2,channel3,channel4}'
     )
-
-    if (channel1 > channel1_threshold):
-
 
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--ip', type=str, required=False,
-                    default="10.0.0.108", help="The ip to listen on")
-                    # 192.168.10.2
-                    # 10.0.0.108
-parser.add_argument('-p', '--udp_port', type=str, required=False, default=14739,
-                    help="The UDP port to listen on")
+                    # CHECK IP ADDRESS
+                    default="192.168.10.2", help="The ip to listen on")
+parser.add_argument('-p', '--udp_port', type=str, required=False,
+                    # CHECK PORT NUMBER
+                    default=14739,help="The UDP port to listen on")
 parser.add_argument('-t', '--topic', type=str, required=False,
                     default='/PetalStream/eeg', help="The topic to print")
 args = parser.parse_args()
